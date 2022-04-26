@@ -64,7 +64,7 @@ rl.on('line', (line) => {
     } else if(line == "version" | line == "v") {
         console.log('module bot V' + version)
     } else if(line == "help") {
-        console.log(`${colors.FgBlue}help${colors.FgCyan}\n-> list of commands\n${colors.FgBlue}version${colors.FgCyan}\n-> module bot version\n${colors.FgBlue}update${colors.FgCyan}\n-> update module bot (index.js)\n${colors.FgBlue}module install [module]${colors.FgCyan}\n-> install a new module\n${colors.FgBlue}module delete [module]${colors.FgCyan}\n-> uninstall a module\n${colors.FgRed}exit${colors.Reset}`)
+        console.log(`${colors.FgBlue}help${colors.FgCyan}\n-> list of commands\n${colors.FgBlue}version${colors.FgCyan}\n-> module bot version\n${colors.FgBlue}update${colors.FgCyan}\n-> update module bot (index.js)\n${colors.FgBlue}module install [module]${colors.FgCyan}\n-> install a new module\n${colors.FgBlue}module delete [module]${colors.FgCyan}\n-> uninstall a module\n${colors.FgBlue}dependence install [name]\n${colors.FgCyan}-> install a new dep\n${colors.FgBlue}dependence delete [name]\n${colors.FgCyan}-> delete a dep\n${colors.FgRed}exit${colors.Reset}`)
     } else if(line == "modules") {
         const modules = new Map()
         fs.readdirSync('./modules').forEach(e => {
@@ -87,14 +87,14 @@ const deps = {
         check(repo)
         function check(num) {
             https.get("https://raw.githubusercontent.com" + config['dependencies-repos'][num] + "/" + name, res => {
-                const path = "./dependencies/" + name; 
-                const filePath = fs.createWriteStream(path);
                 if(res.statusCode !== 200) {
                     repo++
                     if(repo < config['dependencies-repos'].length) check(repo)
                     else console.log(colors.FgRed + "couldn't find the module" + colors.Reset)
                     return
                 }    
+                const path = "./dependencies/" + name; 
+                const filePath = fs.createWriteStream(path);
                 res.pipe(filePath);
                 filePath.on('finish', () => {
                     filePath.close();
