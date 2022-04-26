@@ -50,6 +50,10 @@ rl.on('line', (line) => {
         else if(args[1] == "delete" | args[1] == "del" | args[1] == "d") {
             mods.delete(args[2])
         } 
+        //update
+        else if(args[1] == "update") {
+            mods.update()
+        } 
     } else if(args[0] == "dependence" | args[0] == "dep" | args[0] == "d") {
         if(args[1] == "install" | args[1] == "i") {
             deps.add(args[2])
@@ -60,7 +64,7 @@ rl.on('line', (line) => {
     } else if(line == "version" | line == "v") {
         console.log('module bot V' + version)
     } else if(line == "help") {
-        console.log(`${colors.FgBlue}help${colors.FgCyan}\n-> list of commands\n${colors.FgBlue}version${colors.FgCyan}\n-> module bot version\n${colors.FgBlue}update${colors.FgCyan}\n-> update module bot (index.js)\n${colors.FgBlue}install [module]${colors.FgCyan}\n-> install a new module\n${colors.FgBlue}delete [module]${colors.FgCyan}\n-> uninstall a module\n${colors.FgRed}exit${colors.Reset}`)
+        console.log(`${colors.FgBlue}help${colors.FgCyan}\n-> list of commands\n${colors.FgBlue}version${colors.FgCyan}\n-> module bot version\n${colors.FgBlue}update${colors.FgCyan}\n-> update module bot (index.js)\n${colors.FgBlue}module install [module]${colors.FgCyan}\n-> install a new module\n${colors.FgBlue}module delete [module]${colors.FgCyan}\n-> uninstall a module\n${colors.FgRed}exit${colors.Reset}`)
     } else if(line == "modules") {
         const modules = new Map()
         fs.readdirSync('./modules').forEach(e => {
@@ -101,7 +105,9 @@ const deps = {
     },
     delete: function(name) {
         if(fs.existsSync('./dependencies/' + name)) {
-            fs.unlink('./dependencies/' + name)
+            fs.unlink('./dependencies/' + name, err => {
+                if(err) console.log(colors.FgRed + "couldn't find the dependence" + colors.Reset)
+            })
             console.log(colors.FgGreen + 'Deleted ' + name + colors.Reset); 
         }
         else console.log(colors.FgRed + "couldn't find the dependence" + colors.Reset)
@@ -166,5 +172,30 @@ const mods = {
                 else console.log(colors.FgGreen + 'Deleted' + colors.Reset); 
             })
         } else console.log(colors.FgRed + name + " is not installed" + colors.Reset)
+    },
+    json: function(name) {
+        var repo = 0
+        check(repo)
+        function check(num) {
+            https.get("https://raw.githubusercontent.com" + config.repos[num] + "/" + name + "/" + "module.json", res => {
+                var data = ""
+                res.on('data', dat => {
+                    data += dat.toString()
+                })
+                res.on('end', () => {
+                    if(res.statusCode !== 200) {
+                        repo++
+                        if(repo < config.repos.length) check(repo)
+                        else console.log(colors.FgRed + "couldn't find the module" + colors.Reset)
+                        return
+                    }                        
+                    return JSON.parse(data)
+                })
+            })
+        }
+    },
+    update: function() {
+        //code
+        console.log('cannot update as of right now please use m i [module] instead')
     }
 }
