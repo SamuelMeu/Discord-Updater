@@ -42,36 +42,10 @@ rl.on('line', (line) => {
             console.log(colors.FgRed + 'error' + colors.Reset)
         }
     } else if(args[0] == "install") {
-        if(args[1].startsWith('https')) {
-            const stream = https.get(args[1], (res) => {
-                const path = `./modules/${args[1].split('/')[args[1].split('/').length - 1]}.js`; 
-                const filePath = fs.createWriteStream(path);
-                res.pipe(filePath);
-                filePath.on('finish',() => {
-                    filePath.close();
-                    console.log(colors.FgGreen + 'Download Completed' + colors.Reset); 
-                })
-            })
-            stream.on('error', () => {
-                console.log(colors.FgRed + "couldn't find the module " + args[1] + colors.Reset)
-                stream.end()
-            })
-        } else if(args[1].startsWith('http')) {
-            const stream = http.get(args[1], (res) => {
-                const path = `./modules/${args[1].split('/')[args[1].split('/').length - 1]}.js`; 
-                const filePath = fs.createWriteStream(path);
-                res.pipe(filePath);
-                filePath.on('finish',() => {
-                    filePath.close();
-                    console.log(colors.FgGreen + 'Download Completed' + colors.Reset); 
-                })
-            })
-            stream.on('error', () => {
-                console.log(colors.FgRed + "couldn't find the module " + args[1] + colors.Reset)
-                stream.end()
-            })
-        } else {
-            https.get('https://flywer.xyz/others/repo.json', res => {
+        var repo = 0
+        check
+        function check() {
+            https.get(config.repos[repo] + args[1], res => {
                 var data = ""
                 res.on('data', dat => {
                     data += dat.toString()
@@ -92,6 +66,7 @@ rl.on('line', (line) => {
                         console.log(colors.FgRed + "couldn't find the module " + args[1] + colors.Reset)
                     }
                 })
+                res.on('error')
             })
         }
     } else if(args[0] == "delete") {
