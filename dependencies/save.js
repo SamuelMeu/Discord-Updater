@@ -27,6 +27,11 @@ module.exports = class {
             })
         }
     }
+    has(name) {
+        if(this.content[name] !== undefined) {
+            return true
+        } else return false
+    }
     get(name) {
         return this.content[name]
     }
