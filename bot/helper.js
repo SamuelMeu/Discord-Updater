@@ -18,7 +18,7 @@ rl.on('line', (line) => {
     if(line == "update") {
         try {
             console.log('updating 1/2')
-            const url = 'https://flywer.xyz/app/download/23';
+            const url = config.index;
             https.get(url,(res) => {
                 const path = `./index.js`; 
                 const filePath = fs.createWriteStream(path);
@@ -26,7 +26,7 @@ rl.on('line', (line) => {
                 filePath.on('finish',() => {
                     filePath.close();
                     console.log('updating 2/2'); 
-                    const url = 'https://flywer.xyz/app/download/24';
+                    const url = config.helper;
                     https.get(url,(res) => {
                         const path = `./helper.js`; 
                         const filePath = fs.createWriteStream(path);
