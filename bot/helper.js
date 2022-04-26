@@ -88,7 +88,7 @@ rl.on('line', (line) => {
                     if(err) console.log(err)
                     else console.log(colors.FgGreen + 'Deleted' + colors.Reset); 
                 })
-            } else console.log(colors.FgRed + args[1] + " is not installed" + colors.Reset)
+            } else console.log(colors.FgRed + args[2] + " is not installed" + colors.Reset)
         } 
     } else if(line == "version" | line == "v") {
         console.log('module bot V' + version)
@@ -114,21 +114,19 @@ const deps = {
         var repo = 0
         check(repo)
         function check(num) {
-            https.get("https://raw.githubusercontent.com" + config['dependencies-repos'][num] + name, res => {
-                https.get(link,(res) => {
-                    const path = "./dependencies/" + name; 
-                    const filePath = fs.createWriteStream(path);
-                    if(res.statusCode !== 200) {
-                        repo++
-                        if(repo < config['dependencies-repos'].length) check(repo)
-                        else console.log(colors.FgRed + "couldn't find the module" + colors.Reset)
-                        return
-                    }    
-                    res.pipe(filePath);
-                    filePath.on('finish', () => {
-                        filePath.close();
-                        console.log(colors.FgGreen + 'Downloaded dep ' + args[2] + colors.Reset); 
-                    })
+            https.get("https://raw.githubusercontent.com" + config['dependencies-repos'][num] + "/" + name, res => {
+                const path = "./dependencies/" + name; 
+                const filePath = fs.createWriteStream(path);
+                if(res.statusCode !== 200) {
+                    repo++
+                    if(repo < config['dependencies-repos'].length) check(repo)
+                    else console.log(colors.FgRed + "couldn't find the module" + colors.Reset)
+                    return
+                }    
+                res.pipe(filePath);
+                filePath.on('finish', () => {
+                    filePath.close();
+                    console.log(colors.FgGreen + 'Downloaded dep ' + name + colors.Reset); 
                 })
             })
         }
