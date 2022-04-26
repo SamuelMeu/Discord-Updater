@@ -2,8 +2,8 @@
     "token": "default",
     "repos": ["/SamuelMeu/Module-Bot/main/modules"],
     "dependencies-repos": ["/SamuelMeu/Module-Bot/main/dependencies"],
-    "index-url": "",
-    "helper-url": "",
+    "index-url": "https://raw.githubusercontent.com/SamuelMeu/Module-Bot/main/bot/index.js",
+    "helper-url": "https://raw.githubusercontent.com/SamuelMeu/Module-Bot/main/bot/helper.js",
     "bot": {
         "admins": ["id"],
         "prefix": "!"

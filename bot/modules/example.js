@@ -1,5 +1,5 @@
 const client = require('../index').client
-const example_dep = require('../dependencies/example')
+const example = require('../dependencies/example')
 module.exports = {
     name: "example",
     version: "1.0",
@@ -7,6 +7,6 @@ module.exports = {
     source: "url",
     enabled: true,
     onReady: function() {
-        example_dep.log(client.user.username)
+        example.log(client.user.username)
     }
 }

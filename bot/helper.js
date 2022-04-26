@@ -3,6 +3,7 @@ const fs = require('fs')
 const https = require('https')
 const http = require('http')
 const config = require('./config.json')
+//test
 const version = "1.1"
 //colors for terminal
 const colors = require('./colors.json')
@@ -18,7 +19,7 @@ rl.on('line', (line) => {
     if(line == "update") {
         try {
             console.log('updating 1/2')
-            const url = config.index;
+            const url = config['index-url'];
             https.get(url,(res) => {
                 const path = `./index.js`; 
                 const filePath = fs.createWriteStream(path);
@@ -26,7 +27,7 @@ rl.on('line', (line) => {
                 filePath.on('finish',() => {
                     filePath.close();
                     console.log('updating 2/2'); 
-                    const url = config.helper;
+                    const url = config['helper-url'];
                     https.get(url,(res) => {
                         const path = `./helper.js`; 
                         const filePath = fs.createWriteStream(path);
@@ -44,52 +45,19 @@ rl.on('line', (line) => {
     } else if(args[0] == "mod" | args[0] == "module" | args[0] == "m") {
         //install
         if(args[1] == "install" | args[1] == "i") {
-            var repo = 0
-            check(repo)
-            function check(num) {
-                https.get("https://raw.githubusercontent.com" + config.repos[num] + "/" + args[2] + "/" + "module.json", res => {
-                    var data = ""
-                    res.on('data', dat => {
-                        data += dat.toString()
-                    })
-                    res.on('end', () => {
-                        if(res.statusCode !== 200) {
-                            repo++
-                            if(repo < config.repos.length) check(repo)
-                            else console.log(colors.FgRed + "couldn't find the module" + colors.Reset)
-                            return
-                        }                        
-                        const json = JSON.parse(data)
-                        const link = "https://raw.githubusercontent.com" + config.repos[num] + "/" + args[2] + "/index.js"
-                        if(json.dependencies.length !== 0) {
-                            json.dependencies.forEach(d => {
-                                const a = d.split('@')
-                                if(a[1] >= deps.version(a[0])) return
-                                else deps.add(a[0])
-                            })
-                        }
-                        https.get(link,(res) => {
-                            const path = "./modules/" + args[2].replaceAll('/', '') + ".js"; 
-                            const filePath = fs.createWriteStream(path);
-                            res.pipe(filePath);
-                            filePath.on('finish', () => {
-                                filePath.close();
-                                console.log(colors.FgGreen + 'Downloaded ' + args[2] + colors.Reset); 
-                            })
-                        })
-                    })
-                })
-            }
+            mods.add(args[2])
         }
         //delete
-        else if(args[1] == "delete") {
-            if(fs.existsSync(`./modules/${args[2].replaceAll('/', '')}.js`)) {
-                fs.unlink(`./modules/${args[2].replaceAll('/', '')}.js`, (err) => {
-                    if(err) console.log(err)
-                    else console.log(colors.FgGreen + 'Deleted' + colors.Reset); 
-                })
-            } else console.log(colors.FgRed + args[2] + " is not installed" + colors.Reset)
+        else if(args[1] == "delete" | args[1] == "del" | args[1] == "d") {
+            mods.delete(args[2])
         } 
+    } else if(args[0] == "dependence" | agrs[0] == "dep" | args[0] == "d") {
+        if(args[1] == "install" | args[1] == "i") {
+            deps.add(args[2])
+        }
+        if(args[1] == "delete" | args[1] == "del" | args[1] == "d") {
+            deps.delete(args[2])
+        }
     } else if(line == "version" | line == "v") {
         console.log('module bot V' + version)
     } else if(line == "help") {
@@ -109,6 +77,7 @@ rl.on('line', (line) => {
         console.log(colors.FgRed + "-> type help for a list of commands" + colors.Reset)
     }
 })
+
 const deps = {
     add: function(name) {
         var repo = 0
@@ -149,5 +118,54 @@ const deps = {
             return require('./dependencies/' + name).version
         }
         else return undefined
+    }
+}
+
+const mods = {
+    add: function(name) {
+        var repo = 0
+        check(repo)
+        function check(num) {
+            https.get("https://raw.githubusercontent.com" + config.repos[num] + "/" + name + "/" + "module.json", res => {
+                var data = ""
+                res.on('data', dat => {
+                    data += dat.toString()
+                })
+                res.on('end', () => {
+                    if(res.statusCode !== 200) {
+                        repo++
+                        if(repo < config.repos.length) check(repo)
+                        else console.log(colors.FgRed + "couldn't find the module" + colors.Reset)
+                        return
+                    }                        
+                    const json = JSON.parse(data)
+                    const link = "https://raw.githubusercontent.com" + config.repos[num] + "/" + name + "/index.js"
+                    if(json.dependencies.length !== 0) {
+                        json.dependencies.forEach(d => {
+                            const a = d.split('@')
+                            if(a[1] >= deps.version(a[0])) return
+                            else deps.add(a[0])
+                        })
+                    }
+                    https.get(link,(res) => {
+                        const path = "./modules/" + name.replaceAll('/', '') + ".js"; 
+                        const filePath = fs.createWriteStream(path);
+                        res.pipe(filePath);
+                        filePath.on('finish', () => {
+                            filePath.close();
+                            console.log(colors.FgGreen + 'Downloaded ' + name + colors.Reset); 
+                        })
+                    })
+                })
+            })
+        }
+    },
+    delete: function(name) {
+        if(fs.existsSync(`./modules/${name.replaceAll('/', '')}.js`)) {
+            fs.unlink(`./modules/${name.replaceAll('/', '')}.js`, (err) => {
+                if(err) console.log(err)
+                else console.log(colors.FgGreen + 'Deleted' + colors.Reset); 
+            })
+        } else console.log(colors.FgRed + name + " is not installed" + colors.Reset)
     }
 }
