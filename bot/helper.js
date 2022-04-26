@@ -3,7 +3,6 @@ const fs = require('fs')
 const https = require('https')
 const http = require('http')
 const config = require('./config.json')
-//test
 const version = "1.1"
 //colors for terminal
 const colors = require('./colors.json')
@@ -51,7 +50,7 @@ rl.on('line', (line) => {
         else if(args[1] == "delete" | args[1] == "del" | args[1] == "d") {
             mods.delete(args[2])
         } 
-    } else if(args[0] == "dependence" | agrs[0] == "dep" | args[0] == "d") {
+    } else if(args[0] == "dependence" | args[0] == "dep" | args[0] == "d") {
         if(args[1] == "install" | args[1] == "i") {
             deps.add(args[2])
         }
