@@ -1,0 +1,11 @@
+{
+    "token": "default",
+    "repos": ["/SamuelMeu/Module-Bot/main/modules"],
+    "dependencies-repos": ["/SamuelMeu/Module-Bot/main/dependencies"],
+    "index-url": "",
+    "helper-url": "",
+    "bot": {
+        "admins": ["id"],
+        "prefix": "!"
+    }
+}

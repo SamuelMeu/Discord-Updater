@@ -2,7 +2,7 @@ const read = require('readline')
 const fs = require('fs')
 const https = require('https')
 const http = require('http')
-const config = require('./configs/config.json')
+const config = require('./config.json')
 const version = "1.1"
 //colors for terminal
 const colors = require('./colors.json')
@@ -41,41 +41,55 @@ rl.on('line', (line) => {
         } catch {
             console.log(colors.FgRed + 'error' + colors.Reset)
         }
-    } else if(args[0] == "install") {
-        var repo = 0
-        check
-        function check() {
-            https.get(config.repos[repo] + args[1], res => {
-                var data = ""
-                res.on('data', dat => {
-                    data += dat.toString()
-                })
-                res.on('end', () => {
-                    const link = JSON.parse(data)[args[1]]
-                    if(link !== undefined) {
+    } else if(args[0] == "mod" | args[0] == "module" | args[0] == "m") {
+        //install
+        if(args[1] == "install" | args[1] == "i") {
+            var repo = 0
+            check(repo)
+            function check(num) {
+                https.get("https://raw.githubusercontent.com" + config.repos[num] + "/" + args[2] + "/" + "module.json", res => {
+                    var data = ""
+                    res.on('data', dat => {
+                        data += dat.toString()
+                    })
+                    res.on('end', () => {
+                        if(res.statusCode !== 200) {
+                            repo++
+                            if(repo < config.repos.length) check(repo)
+                            else console.log(colors.FgRed + "couldn't find the module" + colors.Reset)
+                            return
+                        }                        
+                        const json = JSON.parse(data)
+                        const link = "https://raw.githubusercontent.com" + config.repos[num] + "/" + args[2] + "/index.js"
+                        if(json.dependencies.length !== 0) {
+                            json.dependencies.forEach(d => {
+                                const a = d.split('@')
+                                if(a[1] >= deps.version(a[0])) return
+                                else deps.add(a[0])
+                            })
+                        }
                         https.get(link,(res) => {
-                            const path = `./modules/${args[1].replace('/', '-')}.js`; 
+                            const path = "./modules/" + args[2].replaceAll('/', '') + ".js"; 
                             const filePath = fs.createWriteStream(path);
                             res.pipe(filePath);
-                            filePath.on('finish',() => {
+                            filePath.on('finish', () => {
                                 filePath.close();
-                                console.log(colors.FgGreen + 'Download Completed' + colors.Reset); 
+                                console.log(colors.FgGreen + 'Downloaded ' + args[2] + colors.Reset); 
                             })
                         })
-                    } else {
-                        console.log(colors.FgRed + "couldn't find the module " + args[1] + colors.Reset)
-                    }
+                    })
                 })
-                res.on('error')
-            })
+            }
         }
-    } else if(args[0] == "delete") {
-        if(fs.existsSync(`./modules/${args[1]}.js`)) {
-            fs.unlink(`./modules/${args[1]}.js`, (err) => {
-                if(err) console.log(err)
-                else console.log(colors.FgGreen + 'Deleted' + colors.Reset); 
-            })
-        } else console.log(colors.FgRed + args[1] + " is not installed" + colors.Reset)
+        //delete
+        else if(args[1] == "delete") {
+            if(fs.existsSync(`./modules/${args[2].replaceAll('/', '')}.js`)) {
+                fs.unlink(`./modules/${args[2].replaceAll('/', '')}.js`, (err) => {
+                    if(err) console.log(err)
+                    else console.log(colors.FgGreen + 'Deleted' + colors.Reset); 
+                })
+            } else console.log(colors.FgRed + args[1] + " is not installed" + colors.Reset)
+        } 
     } else if(line == "version" | line == "v") {
         console.log('module bot V' + version)
     } else if(line == "help") {
@@ -95,3 +109,47 @@ rl.on('line', (line) => {
         console.log(colors.FgRed + "-> type help for a list of commands" + colors.Reset)
     }
 })
+const deps = {
+    add: function(name) {
+        var repo = 0
+        check(repo)
+        function check(num) {
+            https.get("https://raw.githubusercontent.com" + config['dependencies-repos'][num] + name, res => {
+                https.get(link,(res) => {
+                    const path = "./dependencies/" + name; 
+                    const filePath = fs.createWriteStream(path);
+                    if(res.statusCode !== 200) {
+                        repo++
+                        if(repo < config['dependencies-repos'].length) check(repo)
+                        else console.log(colors.FgRed + "couldn't find the module" + colors.Reset)
+                        return
+                    }    
+                    res.pipe(filePath);
+                    filePath.on('finish', () => {
+                        filePath.close();
+                        console.log(colors.FgGreen + 'Downloaded dep ' + args[2] + colors.Reset); 
+                    })
+                })
+            })
+        }
+    },
+    delete: function(name) {
+        if(fs.existsSync('./dependencies/' + name)) {
+            fs.unlink('./dependencies/' + name)
+            console.log(colors.FgGreen + 'Deleted ' + name + colors.Reset); 
+        }
+        else console.log(colors.FgRed + "couldn't find the dependence" + colors.Reset)
+    },
+    has: function(name) {
+        if(fs.existsSync('./dependencies/' + name)) {
+            return true
+        }
+        else return false
+    },
+    version: function(name) {
+        if(fs.existsSync('./dependencies/' + name)) {
+            return require('./dependencies/' + name).version
+        }
+        else return undefined
+    }
+}
