@@ -45,7 +45,7 @@ module.exports = class {
         if(this.auto) this.save()
     }
     add(name, add) {
-        this.set(name, this.get(name) += add)
+        this.set(name, this.get(name) + add)
         if(this.auto) this.save()
     }
     save() {
