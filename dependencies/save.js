@@ -48,6 +48,10 @@ module.exports = class {
         this.set(name, this.get(name) + add)
         if(this.auto) this.save()
     }
+    sub(name, sub) {
+        this.set(name, this.get(name) - sub)
+        if(this.auto) this.save()
+    }
     save() {
         fs.writeFile('./saves/' + this.path, JSON.stringify(this.content), 'utf-8', (err) => {
             if(err) console.log(err) 
