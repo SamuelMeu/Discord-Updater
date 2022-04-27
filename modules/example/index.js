@@ -4,7 +4,6 @@ module.exports = {
     name: "example",
     version: "1.0",
     author: "SamuelMeu",
-    source: "url",
     enabled: true,
     onReady: function() {
         example.log(client.user.username)
