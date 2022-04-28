@@ -20,7 +20,7 @@ module.exports = {
                 })
                 console.log('a module required a new variable in config.json, please fill out the value of ' + name + ' in ' + categ)
                 fs.writeFileSync('./config.json', JSON.stringify(config, null, 4), 'utf8')
-                exit()
+                return value
             } else if(config[categ] !== undefined) {
                 if(config[categ][name] == undefined) {
                     Object.defineProperty(config[categ], name, {
@@ -29,7 +29,7 @@ module.exports = {
                     })
                     console.log('a module required a new variable in config.json, please fill out the value of ' + name + ' in ' + categ)
                     fs.writeFileSync('./config.json', JSON.stringify(config, null, 4), 'utf8')
-                    exit()
+                    return value
                 }
                 else return config[categ][name]
             }
@@ -44,11 +44,8 @@ module.exports = {
                 })
                 fs.writeFileSync('./config.json', JSON.stringify(config, null, 4), 'utf8')
                 console.log('a module required a new variable in config.json, please fill out the value of ' + name)
-                exit()
+                return value
             }
         }
     }
-}
-function exit() {
-    setTimeout(process.exit(), 3000)
 }

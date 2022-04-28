@@ -1,0 +1,4 @@
+{
+    "version": "1.0",
+    "dependencies": ["config.js@1", "users.js@1"]
+}
