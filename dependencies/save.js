@@ -58,6 +58,9 @@ module.exports = class {
             else return true
         })
     }
+    delete(name) {
+        delete this.content(name)
+    }
 }
 
 //example code:
