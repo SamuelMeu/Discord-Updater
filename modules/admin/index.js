@@ -1,5 +1,6 @@
 const client = require('../index').client
-const admins = require('../config.json').bot.admins
+const checker = require('../dependencies/config')
+const admins = checker(['id'], 'admins', 'bot')
 
 module.exports = {
     name: "example",
